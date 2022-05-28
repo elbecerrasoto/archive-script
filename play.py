@@ -23,5 +23,6 @@ def get_targets():
         if not re.match(RE_EXCLUDE, file):
             print(file)
 
-generate_name()
-get_targets()
+if __name__=="__main__":
+    generate_name()
+    get_targets()
