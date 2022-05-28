@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import shutil
 import os
 import re
 import datetime as dt
@@ -36,9 +37,11 @@ if __name__ == "__main__":
     BASE = "archived/"
     DAY = generate_name()
 
-    check_create(BASE + DAY)
+    DESTINATION = BASE + DAY
+
+    check_create(DESTINATION)
 
     TARGETS = get_targets()
 
     for target in TARGETS:
-        ...
+        shutil.move(target, DESTINATION)
