@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime as dt
 import os
 import re
@@ -10,6 +11,22 @@ from pathlib import Path
 # Doing the small stuff first
 # Leave the high level for later
 
+# WIP
+ARCHIVE_DIR = "archived"
+EXCLUDE_REGEX = "WIP"
+
+DRY = True
+
+parser = argparse.ArgumentParser()
+parser.description = "Get out of the way!!! Moves unmarked files into the 'archived' directory."
+
+parser.add_argument("description", nargs="?", help="It will be appended to the archiving directory.")
+
+args = parser.parse_args()
+
+suffix = args.description
+
+print(f"Suffix is {suffix}")
 
 def generate_name(suffix: str = ""):
     NOW = dt.datetime.now()
@@ -44,5 +61,6 @@ if __name__ == "__main__":
 
     TARGETS = get_targets()
 
-    for target in TARGETS:
-        shutil.move(target, DESTINATION)
+    if not DRY:
+        for target in TARGETS:
+            shutil.move(target, DESTINATION)
