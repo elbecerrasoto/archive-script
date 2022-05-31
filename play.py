@@ -11,22 +11,34 @@ from pathlib import Path
 # Doing the small stuff first
 # Leave the high level for later
 
-# WIP
-ARCHIVE_DIR = "archived"
-EXCLUDE_REGEX = "WIP"
+# Defaults
+ARCHIVE_DIR = r"archived"
+EXCLUDE_REGEX = r"^EM|^em_"
 
 DRY = True
 
 parser = argparse.ArgumentParser()
-parser.description = "Get out of the way!!! Moves unmarked files into the 'archived' directory."
+parser.description = (
+    "Get out of the way!!! Moves unmarked files into the 'archived' directory."
+)
 
-parser.add_argument("description", nargs="?", help="It will be appended to the archiving directory.")
+parser.add_argument(
+    "description", nargs="?", help="It will be appended to the archiving directory."
+)
+
+parser.add_argument(
+    "--dry",
+    "-d",
+    action="store_true",
+    help="Dry run.",
+)
 
 args = parser.parse_args()
 
 suffix = args.description
 
 print(f"Suffix is {suffix}")
+
 
 def generate_name(suffix: str = ""):
     NOW = dt.datetime.now()
@@ -36,9 +48,14 @@ def generate_name(suffix: str = ""):
 
 
 def get_targets():
-    RE_EXCLUDE = re.compile(r"archived|^\.|^EM|^em_")
 
-    return [i for i in os.listdir() if not re.match(RE_EXCLUDE, i)]
+    dot_files = r"\.|"
+    archive_dir = r"^" + ARCHIVE_DIR + r"$|"
+    regex = dot_files + archive_dir + EXCLUDE_REGEX
+
+    RE_EXCLUDE = re.compile(rf"{regex}")
+
+    return [i for i in os.listdir() if not re.search(RE_EXCLUDE, i)]
 
 
 def check_create(path):
