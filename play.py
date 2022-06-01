@@ -15,16 +15,23 @@ from pathlib import Path
 ARCHIVE_DIR = r"archived"
 EXCLUDE_REGEX = r"^EM|^em_"
 
-DRY = True
-
 parser = argparse.ArgumentParser()
 parser.description = (
     "Get out of the way!!! Moves unmarked files into the 'archived' directory."
 )
 
 parser.add_argument(
+    "description", nargs="?", default="", help="It will be appended to the archiving directory."
+)
+
+parser.add_argument(
+    "archive_dir", nargs="?", help="It will be appended to the archiving directory."
+)
+
+parser.add_argument(
     "description", nargs="?", help="It will be appended to the archiving directory."
 )
+
 
 parser.add_argument(
     "--dry",
@@ -35,7 +42,9 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
 suffix = args.description
+DRY = args.dry
 
 print(f"Suffix is {suffix}")
 
