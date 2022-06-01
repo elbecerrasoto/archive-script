@@ -16,6 +16,7 @@ ARCHIVE_DIR = r"archived"
 EXCLUDE_REGEX = r"^EM|^em_"
 
 parser = argparse.ArgumentParser()
+
 parser.description = (
     "Get out of the way!!! Moves unmarked files into the 'archived' directory."
 )
@@ -24,13 +25,13 @@ parser.add_argument(
     "description", nargs="?", default="", help="It will be appended to the archiving directory."
 )
 
-parser.add_argument(
-    "archive_dir", nargs="?", help="It will be appended to the archiving directory."
-)
+# parser.add_argument(
+#     "archive_dir", nargs="?", help="It will be appended to the archiving directory."
+# )
 
-parser.add_argument(
-    "description", nargs="?", help="It will be appended to the archiving directory."
-)
+# parser.add_argument(
+#     "description", nargs="?", help="It will be appended to the archiving directory."
+# )
 
 
 parser.add_argument(
@@ -43,10 +44,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-suffix = args.description
+SUFFIX = args.description
+# DRY = args.dry
 DRY = args.dry
 
-print(f"Suffix is {suffix}")
+# print(f"Suffix is {suffix}")
 
 
 def generate_name(suffix: str = ""):
@@ -58,7 +60,7 @@ def generate_name(suffix: str = ""):
 
 def get_targets():
 
-    dot_files = r"\.|"
+    dot_files = r"^\.|"
     archive_dir = r"^" + ARCHIVE_DIR + r"$|"
     regex = dot_files + archive_dir + EXCLUDE_REGEX
 
@@ -79,13 +81,15 @@ def check_create(path):
 if __name__ == "__main__":
 
     BASE = "archived/"
-    DAY = generate_name()
-
+    DAY = generate_name(SUFFIX)
     DESTINATION = BASE + DAY
+
+    if DRY: print(f"Dry Run: {DESTINATION} would've been created")
 
     check_create(DESTINATION)
 
     TARGETS = get_targets()
+    if DRY: print(f"Dry Run: {TARGETS} would've moved.")
 
     if not DRY:
         for target in TARGETS:
