@@ -7,6 +7,7 @@ from os import system as cli
 # globals into the lowest category
 # then start climbing
 
+
 @pytest.fixture
 def tmp_file(tmp_path):
     CONTENT = "Destination Demoted!"

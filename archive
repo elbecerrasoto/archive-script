@@ -1,96 +1,49 @@
-#!/usr/bin/env python
-
-import argparse
-import datetime as dt
+#!/usr/bin/env python3
 import os
-import re
 import shutil
-import sys
+import argparse
 from pathlib import Path
 
-# Doing the small stuff first
-# Leave the high level for later
+ARCHIVED = Path("./archived/")
 
-# Defaults
-ARCHIVE_DIR = r"archived"
-EXCLUDE_REGEX = r"^EM|^em_"
+def parse_args():
+    parser = argparse.ArgumentParser()
 
-parser = argparse.ArgumentParser()
+    parser.description = (
+        f"""Get out of my way! I don't want to deal with you!
+        Move files into {ARCHIVED}"""
+    )
 
-parser.description = (
-    "Get out of the way!!! Moves unmarked files into the 'archived' directory."
-)
+    parser.add_argument("targets", nargs="+", help="files to move")
 
-parser.add_argument(
-    "description", nargs="?", default="", help="It will be appended to the archiving directory."
-)
+    parser.add_argument(
+        "--dry",
+        "-d",
+        action="store_true",
+        help="Dry run.",
+    )
 
-# parser.add_argument(
-#     "archive_dir", nargs="?", help="It will be appended to the archiving directory."
-# )
-
-# parser.add_argument(
-#     "description", nargs="?", help="It will be appended to the archiving directory."
-# )
-
-
-parser.add_argument(
-    "--dry",
-    "-d",
-    action="store_true",
-    help="Dry run.",
-)
-
-args = parser.parse_args()
-
-
-SUFFIX = args.description
-# DRY = args.dry
-DRY = args.dry
-
-# print(f"Suffix is {suffix}")
-
-
-def generate_name(suffix: str = ""):
-    NOW = dt.datetime.now()
-    iso_date = NOW.strftime("%F")  # ISO date
-    week_day = NOW.strftime(".%V-%u")  # Week 1..53, and Day 1..7 starting on Monday
-    return iso_date + week_day + suffix
-
-
-def get_targets():
-
-    dot_files = r"^\.|"
-    archive_dir = r"^" + ARCHIVE_DIR + r"$|"
-    regex = dot_files + archive_dir + EXCLUDE_REGEX
-
-    RE_EXCLUDE = re.compile(rf"{regex}")
-
-    return [i for i in os.listdir() if not re.search(RE_EXCLUDE, i)]
-
-
-def check_create(path):
-    path = Path(path)
-    if not os.path.exists(path):
-        os.makedirs(path)
-    else:
-        if path.is_file():
-            sys.exit(f"Error: {path} is a file, doing NOTHING")
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
 
-    BASE = "archived/"
-    DAY = generate_name(SUFFIX)
-    DESTINATION = BASE + DAY
+    args = parse_args()
 
-    if DRY: print(f"Dry Run: {DESTINATION} would've been created")
+    DRY = args.dry
+    TARGETS = args.targets
 
-    check_create(DESTINATION)
+    try:
+        os.mkdir(ARCHIVED)
+    except FileExistsError:
+        if ARCHIVED.is_file():
+            sys.exit(f"Error: {path} is a file.")
 
-    TARGETS = get_targets()
-    if DRY: print(f"Dry Run: {TARGETS} would've moved.")
 
-    if not DRY:
-        for target in TARGETS:
-            shutil.move(target, DESTINATION)
+    for target in TARGETS:
+        target = Path(target)
+        if target == ARCHIVED: continue
+        if DRY:
+            print(f"shutil.move({target}, {ARCHIVED})")
+        else:
+            shutil.move(target, ARCHIVED)
