@@ -34,7 +34,10 @@ if __name__ == "__main__":
     TARGETS = args.targets
 
     try:
-        os.mkdir(ARCHIVED)
+        if DRY:
+            print(f"os.mkdir({ARCHIVED})")
+        else:
+            os.mkdir(ARCHIVED)
     except FileExistsError:
         if ARCHIVED.is_file():
             sys.exit(f"Error: {path} is a file.")

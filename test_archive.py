@@ -1,11 +1,9 @@
-import os
 import pytest
 from pathlib import Path
-from os import system as cli
+import os
 
-# the simplest the better
-# globals into the lowest category
-# then start climbing
+
+PROGRAM = Path("./archive").resolve()
 
 
 @pytest.fixture
@@ -16,25 +14,20 @@ def tmp_file(tmp_path):
     return x
 
 
-def EXEC_ARCHIVE():
-    cli("./emerch --dry")
+# https://stackoverflow.com/questions/55014222/what-are-response-codes-for-256-and-512-for-os-system-in-python-scripting
+def test_exit_with_no_args():
+    assert os.system(f"{PROGRAM}") != 0
 
 
-# TODO: how to check exit status
-def test_exit_01(tmp_file):
-    assert True, "exit 01"
+def test_dry_does_nothing(tmp_file, tmp_path):
+    os.chdir(tmp_path)
+    os.system(f"{PROGRAM} --dry {tmp_file}")
+    assert not (tmp_path / "archived/").exists()
 
 
-def test_archived_exists(tmp_path):
-    ARCHIVED = "./archived/"
-    archived = tmp_path / Path(ARCHIVED)
-    EXEC_ARCHIVE()
-    assert archived.is_dir()
-
-
-def test_move_into_archive(tmp_file):
-    print(f"{tmp_file}")
-    EXEC_ARCHIVE()
-    # run on target
-    # check existence
-    assert False
+def test_archived(tmp_file, tmp_path):
+    os.chdir(tmp_path)
+    os.system(f"{PROGRAM} {tmp_file}")
+    assert (tmp_path / "archived").exists()
+    assert not tmp_file.exists()
+    assert ((tmp_path / "archived") / tmp_file.name).exists()
