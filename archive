@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import shutil
+from pathlib import Path
+
+from utils import gen_naming_scheme
+
+# passing the test
+
+DAY = gen_naming_scheme()
+ARCHIVED = Path("./archived/")
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.description = (
+        f"""Get out of my way! I don't want to deal with you!
+        Move files into {ARCHIVED}"""
+    )
+
+    parser.add_argument("targets", nargs="+", help="files to move")
+
+    parser.add_argument(
+        "--dry",
+        "-d",
+        action="store_true",
+        help="Dry run.",
+    )
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+
+    args = parse_args()
+
+    DRY = args.dry
+    TARGETS = args.targets
+
+    destination = ARCHIVED / DAY
+
+    try:
+        if DRY:
+            print(f"{destination} would've been created.")
+        else:
+            destination.mkdir(parents=True)
+    except FileExistsError:
+        pass # Failing downstream? if destination is a file
+
+    for target in TARGETS:
+        target = Path(target)
+        if target == ARCHIVED: continue
+        if DRY:
+            print(f"{target} would've been moved to {destination})")
+        else:
+            shutil.move(target, destination)

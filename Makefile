@@ -50,7 +50,7 @@ linter : # Finds debugging prints
 	mypy --config-file mypy.ini ./
 
 clean : # Depends on trash-cli  https://github.com/andreafrancia/trash-cli
-	find ./ -type d -name '__pycache__' | xargs -I{} trash {}
+	find ./ -type d -name '__pycache__' | xargs -I{} \rm -r {}
 	find ./ -type d -name '*.egg-info' | xargs -I{} trash {}
 	find ./ -type f -name '*~' | xargs -I{} trash {}
 	find ./ -type f -name 'monkeytype.sqlite3' | xargs -I{} trash {}
