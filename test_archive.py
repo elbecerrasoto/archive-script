@@ -11,10 +11,22 @@ DAY = gen_naming_scheme()
 
 
 @pytest.fixture
-def tmp_file(tmp_path):
+def gen_tmp_files(tmp_path):
+    PATH = tmp_path
+    SUFFIX = ".txt"
     CONTENT = "Destination Demoted!"
-    x = tmp_path / "tmp_file.txt"
-    x.write_text(CONTENT)
+
+    def x(n=1):
+
+        tmp_files = []
+
+        for i in range(n):
+            tmp_file = PATH / (str(i) + SUFFIX)
+            tmp_file.write_text(CONTENT)
+            tmp_files.append(tmp_file)
+
+        return tmp_files
+
     return x
 
 
@@ -23,27 +35,34 @@ def test_exit_with_no_args():
     assert os.system(f"{PROGRAM}") != 0
 
 
-def test_dry_does_nothing(tmp_path, tmp_file):
+def test_dry_does_nothing(tmp_path, gen_tmp_files):
+    (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
     os.system(f"{PROGRAM} --dry {tmp_file}")
     assert not (tmp_path / ARCHIVED).exists()
 
 
-def test_target_is_cleared(tmp_path, tmp_file):
+def test_target_is_cleared(tmp_path, gen_tmp_files):
+    (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
     os.system(f"{PROGRAM} {tmp_file}")
 
     assert not tmp_file.exists(), "target is NOT cleared"
 
 
-def test_target_arrives_at_correct_destination(tmp_path, tmp_file):
+def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files):
+    (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
     os.system(f"{PROGRAM} {tmp_file}")
 
     destination = tmp_path / ARCHIVED / DAY
-    print(destination)
-    print(type(destination))
-    # assert assert_correct_naming_scheme(day)
 
     assert destination.exists(), "destination NOT exists"
     assert (destination / tmp_file.name).exists(), "INcorrect target destination"
+
+
+# def test_name_of_destination_can_be_changed_short_arg():
+#     NAME = "destination_demoted"
+
+#     os.chdir(tmp_path)
+#     os.system(f"{PROGRAM} -d {NAME} {tmp_file}")
