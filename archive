@@ -6,8 +6,6 @@ from pathlib import Path
 
 from utils import gen_naming_scheme
 
-# passing the test
-
 DAY = gen_naming_scheme()
 ARCHIVED = Path("./archived/")
 
@@ -27,6 +25,11 @@ def parse_args():
         action="store_true",
         help="Dry run.",
     )
+
+    parser.add_argument("--unarchive",
+                        "-d",
+                        action="store_true",
+                        help="Undo action.")
 
     return parser.parse_args()
 

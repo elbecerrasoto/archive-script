@@ -61,6 +61,16 @@ def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files):
     assert (destination / tmp_file.name).exists(), "INcorrect target destination"
 
 
+def test_unarchive(tmp_path, gen_tmp_files):
+    tmp_file, = gen_tmp_files(1)
+    os.chdir(tmp_path)
+    os.system(f"{PROGRAM} {tmp_file}")
+
+    os.system(f"{PROGRAM} --unarchive")
+
+    assert tmp_file.exists()
+
+
 def test_name_collisions(tmp_path, gen_tmp_files):
     (tmp_file1, tmp_file2) = gen_tmp_files(2)
 
@@ -75,7 +85,7 @@ def test_name_collisions(tmp_path, gen_tmp_files):
     block_file.write_text(CONTENT)
 
     # Why is not working, cause is not level 1???
-
+    # Is not raising exceptions
     # dir blocking
     # import shutil
     # with pytest.raises(shutil.SameFileError):
