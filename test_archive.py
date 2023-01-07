@@ -62,7 +62,7 @@ def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files):
 
 
 def test_unarchive(tmp_path, gen_tmp_files):
-    tmp_file, = gen_tmp_files(1)
+    (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
     os.system(f"{PROGRAM} {tmp_file}")
 

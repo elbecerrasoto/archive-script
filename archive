@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     DRY = args.dry
     TARGETS = args.targets
+    UNARCHIVE = args.unarchive
 
     destination = ARCHIVED / DAY
 
@@ -56,5 +57,32 @@ if __name__ == "__main__":
         if target == ARCHIVED: continue
         if DRY:
             print(f"{target} would've been moved to {destination})")
-        else:
+        elif not UNARCHIVE:
             shutil.move(target, destination)
+
+
+    HISTORY_FILE = Path('./archived/.archive_history.pickle')
+
+    # Write to the stack,
+    # last element. It grows and shrink by the right.
+    from collections import deque
+    if UNARCHIVE:
+        # POP operation
+        try:
+            with open(HISTORY_FILE, 'rb') as hfile:
+                stackde
+            utargets = stacked_history.pop()
+            for
+        except FileNotFoundError as e:
+            print("Nothing to unarchive.", file=sys.stderr)
+        except IndexError as e:
+            print("Nothing to unarchive.", file=sys.stderr)
+    else:
+        # PUSH (append) operation
+
+    # I am going to use pickle
+    # Delete from the stack
+    # a menos que tuviera un yaml dump
+
+    # Write to the stack, using pickle?, is even easier, ...
+    # read to the stack, using pickle? , is even easier, ...
