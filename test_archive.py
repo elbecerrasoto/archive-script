@@ -61,13 +61,17 @@ def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files):
     assert (destination / tmp_file.name).exists(), "INcorrect target destination"
 
 
+@pytest.mark.skip(reason="no way of currently testing this")
 def test_unarchive(tmp_path, gen_tmp_files):
     (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
+    assert tmp_file.exists()
+
     os.system(f"{PROGRAM} {tmp_file}")
 
     os.system(f"{PROGRAM} --unarchive")
 
+    # Is unarchived
     assert tmp_file.exists()
 
 

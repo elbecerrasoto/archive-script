@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import shutil
+from collections import deque, namedtuple
 from pathlib import Path
 
-from utils import gen_naming_scheme
+from utils import gen_naming_scheme, pickle_obj, unpickle_path
 
 DAY = gen_naming_scheme()
 ARCHIVED = Path("./archived/")
+HISTORY_FILE = Path('./archived/.archive_history.pickle')
+
+Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -27,7 +30,7 @@ def parse_args():
     )
 
     parser.add_argument("--unarchive",
-                        "-d",
+                        "-u",
                         action="store_true",
                         help="Undo action.")
 
@@ -52,37 +55,30 @@ if __name__ == "__main__":
     except FileExistsError:
         pass # Failing downstream? if destination is a file
 
-    for target in TARGETS:
-        target = Path(target)
-        if target == ARCHIVED: continue
-        if DRY:
-            print(f"{target} would've been moved to {destination})")
-        elif not UNARCHIVE:
-            shutil.move(target, destination)
 
+    try:
+       history = unpickle_path(HISTORY_FILE)
+    except FileNotFoundError:
+        history = deque()
 
-    HISTORY_FILE = Path('./archived/.archive_history.pickle')
-
-    # Write to the stack,
-    # last element. It grows and shrink by the right.
-    from collections import deque
+    # Main loop
+    # get right the unarchive
     if UNARCHIVE:
-        # POP operation
-        try:
-            with open(HISTORY_FILE, 'rb') as hfile:
-                stackde
-            utargets = stacked_history.pop()
-            for
-        except FileNotFoundError as e:
-            print("Nothing to unarchive.", file=sys.stderr)
-        except IndexError as e:
-            print("Nothing to unarchive.", file=sys.stderr)
+        pass
     else:
-        # PUSH (append) operation
+        # to be popoulated of Target named tuples
+        single_run = list()
+        for target in TARGETS:
 
-    # I am going to use pickle
-    # Delete from the stack
-    # a menos que tuviera un yaml dump
+            target = Path(target)
+            if target == ARCHIVED: continue
 
-    # Write to the stack, using pickle?, is even easier, ...
-    # read to the stack, using pickle? , is even easier, ...
+            if DRY:
+                print(f"{target} would've been moved to {destination})")
+            else:
+                shutil.move(target, destination)
+                single_run.append(Target(Poriginal=target, Parchived=destination))
+
+        # Push (append) to history stack, grows on the right.
+        history.append(tuple(single_run))
+        pickle_obj(history, HISTORY_FILE)
