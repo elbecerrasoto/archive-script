@@ -12,7 +12,7 @@ def gen_naming_scheme(prefix: str = "", suffix: str = "") -> str:
 
 def unpickle_path(path):
     with open(path, "rb") as f:
-        x = pickle.load(path)
+        x = pickle.load(f)
     return x
 
 

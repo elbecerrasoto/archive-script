@@ -48,7 +48,7 @@ if __name__ == "__main__":
     destination = ARCHIVED / DAY
 
     try:
-        if DRY:
+        if DRY and not destination.exists():
             print(f"{destination} would've been created.")
         else:
             destination.mkdir(parents=True)
@@ -57,14 +57,17 @@ if __name__ == "__main__":
 
 
     try:
-       history = unpickle_path(HISTORY_FILE)
+        history = unpickle_path(HISTORY_FILE)
     except FileNotFoundError:
         history = deque()
 
     # Main loop
-    # get right the unarchive
     if UNARCHIVE:
-        pass
+        # Pop history
+        to_undo = history.pop()
+        for target in to_undo:
+            print(f"move {target.Parchived} to {target.Poriginal.parent}")
+            # shutil.move(target.Parchived,target.Poriginal.parent)
     else:
         # to be popoulated of Target named tuples
         single_run = list()
@@ -77,8 +80,9 @@ if __name__ == "__main__":
                 print(f"{target} would've been moved to {destination})")
             else:
                 shutil.move(target, destination)
-                single_run.append(Target(Poriginal=target, Parchived=destination))
+                single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
 
-        # Push (append) to history stack, grows on the right.
-        history.append(tuple(single_run))
-        pickle_obj(history, HISTORY_FILE)
+        if not DRY:
+            # Push (append) to history stack, grows on the right.
+            history.append(tuple(single_run))
+            pickle_obj(history, HISTORY_FILE)
