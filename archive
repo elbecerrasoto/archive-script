@@ -20,7 +20,7 @@ def parse_args():
         Move files into {ARCHIVED}"""
     )
 
-    parser.add_argument("targets", nargs="+", help="files to move")
+    parser.add_argument("targets", nargs="*", help="files to move")
 
     parser.add_argument(
         "--dry",

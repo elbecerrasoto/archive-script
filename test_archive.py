@@ -35,6 +35,11 @@ def test_exit_with_no_args():
     assert os.system(f"{PROGRAM}") != 0
 
 
+def test_cml_args():
+    #     parser.parse_args(['--sum', '7', '-1', '42'])
+    pass
+
+
 def test_dry_does_nothing(tmp_path, gen_tmp_files):
     (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
