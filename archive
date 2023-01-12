@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import shutil
+import sys
 from collections import deque, namedtuple
 from pathlib import Path
 
@@ -12,7 +13,7 @@ HISTORY_FILE = Path('./archived/.archive_history.pickle')
 
 Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
-def parse_args():
+def get_cliparser():
     parser = argparse.ArgumentParser()
 
     parser.description = (
@@ -20,7 +21,7 @@ def parse_args():
         Move files into {ARCHIVED}"""
     )
 
-    parser.add_argument("targets", nargs="*", help="files to move")
+    parser.add_argument("targets", nargs="*", help="files to move", default=False)
 
     parser.add_argument(
         "--dry",
@@ -34,16 +35,23 @@ def parse_args():
                         action="store_true",
                         help="Undo action.")
 
-    return parser.parse_args()
+    return parser
 
 
 if __name__ == "__main__":
 
-    args = parse_args()
+    PARSER = get_cliparser()
+
+    args = PARSER.parse_args()
 
     DRY = args.dry
     TARGETS = args.targets
     UNARCHIVE = args.unarchive
+
+    if not TARGETS and not UNARCHIVE:
+        # print usage to stdout
+        PARSER.print_help(file=None)
+        sys.exit()
 
     destination = ARCHIVED / DAY
 
@@ -67,7 +75,8 @@ if __name__ == "__main__":
         to_undo = history.pop()
         for target in to_undo:
             print(f"move {target.Parchived} to {target.Poriginal.parent}")
-            # shutil.move(target.Parchived,target.Poriginal.parent)
+            shutil.move(target.Parchived,target.Poriginal.parent)
+            # then check for an empty datedir and delete it
     else:
         # to be popoulated of Target named tuples
         single_run = list()
