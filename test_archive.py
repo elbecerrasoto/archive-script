@@ -50,7 +50,18 @@ def test_parser_typings():
     assert args.targets == list()
     assert args.unarchive is False
     assert args.dry is False
-    # args = PARSER.parse_args()
+
+    args = PARSER.parse_args("-d -u".split())
+
+    assert args.targets == list()
+    assert args.dry is True
+    assert args.unarchive is True
+
+    args = PARSER.parse_args("--dry hello world".split())
+
+    assert args.targets == ["hello", "world"]
+    assert args.dry is True
+    assert args.unarchive is False
 
 
 @pytest.mark.skip(reason="wip")
