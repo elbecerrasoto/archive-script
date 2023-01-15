@@ -5,7 +5,7 @@ import sys
 from collections import deque, namedtuple
 from pathlib import Path
 
-from utils import gen_naming_scheme, pickle_obj, unpickle_path
+from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
 DAY = gen_naming_scheme()
 ARCHIVED = Path("./archived/")
@@ -13,29 +13,6 @@ HISTORY_FILE = Path('./archived/.archive_history.pickle')
 
 Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
-def get_cliparser():
-    parser = argparse.ArgumentParser()
-
-    parser.description = (
-        f"""Get out of my way! I don't want to deal with you!
-        Move files into {ARCHIVED}"""
-    )
-
-    parser.add_argument("targets", nargs="*", help="files to move", default=False)
-
-    parser.add_argument(
-        "--dry",
-        "-d",
-        action="store_true",
-        help="Dry run.",
-    )
-
-    parser.add_argument("--unarchive",
-                        "-u",
-                        action="store_true",
-                        help="Undo action.")
-
-    return parser
 
 
 if __name__ == "__main__":

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+import argparse
 import datetime as dt
 import pickle
+from pathlib import Path
+
+ARCHIVED = Path("./archived/")
 
 
 def gen_naming_scheme(prefix: str = "", suffix: str = "") -> str:
@@ -19,3 +23,23 @@ def unpickle_path(path):
 def pickle_obj(x, path):
     with open(path, "wb") as f:
         pickle.dump(x, f)
+
+
+def get_cliparser():
+    parser = argparse.ArgumentParser()
+
+    parser.description = f"""Get out of my way! I don't want to deal with you!
+        Move files into {ARCHIVED}"""
+
+    parser.add_argument("targets", nargs="*", help="files to move", default=False)
+
+    parser.add_argument(
+        "--dry",
+        "-d",
+        action="store_true",
+        help="Dry run.",
+    )
+
+    parser.add_argument("--unarchive", "-u", action="store_true", help="Undo action.")
+
+    return parser

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from utils import gen_naming_scheme
+from utils import gen_naming_scheme, get_cliparser
 
 PROGRAM = Path("./archive").resolve()
 ARCHIVED = Path("archived/")
@@ -40,11 +40,6 @@ def destination(tmp_path):
 # https://stackoverflow.com/questions/55014222/what-are-response-codes-for-256-and-512-for-os-system-in-python-scripting
 def test_exit_with_no_args():
     assert os.system(f"{PROGRAM}") == 0
-
-
-def test_cml_args():
-    #     parser.parse_args(['--sum', '7', '-1', '42'])
-    pass
 
 
 def test_dry_does_nothing(tmp_path, gen_tmp_files):
@@ -84,8 +79,9 @@ def test_unarchive(tmp_path, gen_tmp_files):
     assert tmp_file.exists()
 
 
+@pytest.mark.skip(reason="wip")
 def test_parser_typings():
-    pass
+    PARSER.parse_args([""])
 
 
 # Random chain of creations and destructions
