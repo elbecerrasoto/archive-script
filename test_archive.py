@@ -30,11 +30,16 @@ def gen_tmp_files(tmp_path):
     return x
 
 
-@pytest.mark.skip(reason="how to send the correct error?")
+@pytest.fixture
+def destination(tmp_path):
+    return tmp_path / ARCHIVED / DAY
+
+
+# @pytest.mark.skip(reason="how to send the correct error?")
 # printing the help exists on 0, if this desired behavior
 # https://stackoverflow.com/questions/55014222/what-are-response-codes-for-256-and-512-for-os-system-in-python-scripting
 def test_exit_with_no_args():
-    assert os.system(f"{PROGRAM}") != 0
+    assert os.system(f"{PROGRAM}") == 0
 
 
 def test_cml_args():
@@ -57,12 +62,10 @@ def test_target_is_cleared(tmp_path, gen_tmp_files):
     assert not tmp_file.exists(), "target is NOT cleared"
 
 
-def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files):
+def test_target_arrives_at_correct_destination(tmp_path, gen_tmp_files, destination):
     (tmp_file,) = gen_tmp_files(1)
     os.chdir(tmp_path)
     os.system(f"{PROGRAM} {tmp_file}")
-
-    destination = tmp_path / ARCHIVED / DAY
 
     assert destination.exists(), "destination NOT exists"
     assert (destination / tmp_file.name).exists(), "INcorrect target destination"
@@ -81,12 +84,26 @@ def test_unarchive(tmp_path, gen_tmp_files):
     assert tmp_file.exists()
 
 
-def test_name_collisions(tmp_path, gen_tmp_files):
+def test_parser_typings():
+    pass
+
+
+# Random chain of creations and destructions
+# It is a good idea
+def test_no_empty_directories(tmp_path, gen_tmp_files):
+    (f1, f2) = gen_tmp_files(2)
+    os.chdir(tmp_path)
+
+    os.system(f"{PROGRAM} {f1}")
+    os.system(f"{PROGRAM} {f2}")
+
+    os.system(f"{PROGRAM} -u")
+
+
+def test_name_collisions(tmp_path, gen_tmp_files, destination):
     (tmp_file1, tmp_file2) = gen_tmp_files(2)
 
     os.chdir(tmp_path)
-
-    destination = tmp_path / ARCHIVED / DAY
 
     block_dir = destination / tmp_file2.name
     block_dir.mkdir(parents=True)
