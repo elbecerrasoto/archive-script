@@ -64,9 +64,8 @@ def test_parser_typings():
     assert args.unarchive is False
 
 
-@pytest.mark.skip(reason="wip")
 def test_robustness_against_empty_string():
-    assert os.system(f"{PROGRAM}" == 0)
+    assert os.system(f"{PROGRAM} ''") == 0
 
 
 def test_dry_does_nothing(tmp_path, gen_tmp_files):

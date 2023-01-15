@@ -58,12 +58,12 @@ if __name__ == "__main__":
         # to be popoulated of Target named tuples
         single_run = list()
         for target in TARGETS:
+            if target == "" or target == str(ARCHIVED): continue
 
             target = Path(target)
-            if target == ARCHIVED: continue
 
             if DRY:
-                print(f"{target} would've been moved to {destination})")
+                print(f"{target} --> {destination})")
             else:
                 shutil.move(target, destination)
                 single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
