@@ -38,7 +38,10 @@ if __name__ == "__main__":
         else:
             destination.mkdir(parents=True)
     except FileExistsError:
-        pass # Failing downstream? if destination is a file
+        if destination.is_file():
+            # if sys.exit print a string sends error code 256 ?!
+            print("Error: there is a file blocking the archiving.")
+            sys.exit()
 
 
     try:
@@ -53,7 +56,7 @@ if __name__ == "__main__":
         for target in to_undo:
             print(f"move {target.Parchived} to {target.Poriginal.parent}")
             shutil.move(target.Parchived,target.Poriginal.parent)
-            # then check for an empty datedir and delete it
+            # then check for an empty dir and delete it
     else:
         # to be popoulated of Target named tuples
         single_run = list()
@@ -65,8 +68,12 @@ if __name__ == "__main__":
             if DRY:
                 print(f"{target} --> {destination})")
             else:
-                shutil.move(target, destination)
-                single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
+                try:
+                    shutil.move(target, destination)
+                    single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
+                except shutil.Error as e:
+                    print("Blocking files/dirs were found", e)
+                    sys.exit()
 
         if not DRY:
             # Push (append) to history stack, grows on the right.

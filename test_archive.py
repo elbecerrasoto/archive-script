@@ -7,7 +7,7 @@ from utils import gen_naming_scheme, get_cliparser
 
 PROGRAM = Path("./archive").resolve()
 ARCHIVED = Path("archived/")
-DAY = gen_naming_scheme()
+DAY = Path(gen_naming_scheme())
 CONTENT = "Destination Demoted!"
 PARSER = get_cliparser()
 
@@ -118,26 +118,31 @@ def test_no_empty_directories(tmp_path, gen_tmp_files):
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
-    (tmp_file1, tmp_file2) = gen_tmp_files(2)
+    (tmp_file1, tmp_file2, tmp_file3) = gen_tmp_files(3)
 
     os.chdir(tmp_path)
 
+    # First the cointaining directory has to be created
     block_dir = destination / tmp_file2.name
     block_dir.mkdir(parents=True)
 
     block_file = destination / tmp_file1.name
     block_file.write_text(CONTENT)
 
-    # Why is not working, cause is not level 1???
-    # Is not raising exceptions
-    # dir blocking
-    # import shutil
-    # with pytest.raises(shutil.SameFileError):
-    #     os.system(f"{PROGRAM} {tmp_file1}")
+    # shutil.Error
+    # triggers exit code 256
+    # same name file is catched by exceptions
+    assert os.system(f"{PROGRAM} {tmp_file1}") == 0
+    # same name dir is catched by exceptions
+    assert os.system(f"{PROGRAM} {tmp_file2}") == 0
 
-    # file blocking
-    # with pytest.raises(FileExistsError):
-    #     os.system(f"{PROGRAM} {tmp_file2}")
+    os.system(f"rm -r {destination}")
+    assert not destination.exists()
+    block_day = "." / ARCHIVED / DAY.name
+    block_day.write_text(CONTENT)
 
-    os.system(f"{PROGRAM} {tmp_file1}")
-    os.system(f"{PROGRAM} {tmp_file2}")
+    out = os.system(f"{PROGRAM} {tmp_file3}")
+
+    assert tmp_file3.exists()
+    assert block_day.is_file()
+    assert out == 0
