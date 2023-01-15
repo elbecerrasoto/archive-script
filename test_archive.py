@@ -9,6 +9,7 @@ PROGRAM = Path("./archive").resolve()
 ARCHIVED = Path("archived/")
 DAY = gen_naming_scheme()
 CONTENT = "Destination Demoted!"
+PARSER = get_cliparser()
 
 
 @pytest.fixture
@@ -40,6 +41,21 @@ def destination(tmp_path):
 # https://stackoverflow.com/questions/55014222/what-are-response-codes-for-256-and-512-for-os-system-in-python-scripting
 def test_exit_with_no_args():
     assert os.system(f"{PROGRAM}") == 0
+
+
+# pytest.mark.skip(reason="wip")
+def test_parser_typings():
+    args = PARSER.parse_args([])
+
+    assert args.targets == list()
+    assert args.unarchive is False
+    assert args.dry is False
+    # args = PARSER.parse_args()
+
+
+@pytest.mark.skip(reason="wip")
+def test_robustness_against_empty_string():
+    assert os.system(f"{PROGRAM}" == 0)
 
 
 def test_dry_does_nothing(tmp_path, gen_tmp_files):
@@ -77,11 +93,6 @@ def test_unarchive(tmp_path, gen_tmp_files):
 
     # Is unarchived
     assert tmp_file.exists()
-
-
-@pytest.mark.skip(reason="wip")
-def test_parser_typings():
-    PARSER.parse_args([""])
 
 
 # Random chain of creations and destructions

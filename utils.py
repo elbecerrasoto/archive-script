@@ -31,7 +31,7 @@ def get_cliparser():
     parser.description = f"""Get out of my way! I don't want to deal with you!
         Move files into {ARCHIVED}"""
 
-    parser.add_argument("targets", nargs="*", help="files to move", default=False)
+    parser.add_argument("targets", nargs="*", help="files to move", default=list())
 
     parser.add_argument(
         "--dry",
