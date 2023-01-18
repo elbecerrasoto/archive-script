@@ -119,12 +119,13 @@ def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     os.system(f"{PROGRAM} -u")
     # f2 returns
     assert destination.exists()
-    # assert set(os.listdir(str(destination))) == set(['f1'])
-    # assert f2.exists()
+    assert set(os.listdir(destination)) == set([f1.name])
+    assert f2.exists()
 
     # f1 returns
-    # os.system(f"{PROGRAM} -u")
-    # assert not destination.exist()
+    os.system(f"{PROGRAM} -u")
+    assert f1.exists()
+    assert not destination.exist()
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
