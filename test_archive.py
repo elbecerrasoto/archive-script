@@ -107,14 +107,24 @@ def test_unarchive(tmp_path, gen_tmp_files):
 
 # Random chain of creations and destructions
 # It is a good idea
-def test_no_empty_directories(tmp_path, gen_tmp_files):
+def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     (f1, f2) = gen_tmp_files(2)
     os.chdir(tmp_path)
 
     os.system(f"{PROGRAM} {f1}")
     os.system(f"{PROGRAM} {f2}")
 
+    assert not f2.exists()
+
     os.system(f"{PROGRAM} -u")
+    # f2 returns
+    assert destination.exists()
+    # assert set(os.listdir(str(destination))) == set(['f1'])
+    # assert f2.exists()
+
+    # f1 returns
+    # os.system(f"{PROGRAM} -u")
+    # assert not destination.exist()
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
