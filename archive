@@ -56,7 +56,12 @@ if __name__ == "__main__":
         for target in to_undo:
             print(f"move {target.Parchived} to {target.Poriginal.parent}")
             shutil.move(target.Parchived,target.Poriginal.parent)
-            # then check for an empty dir and delete it
+
+        path2archived = target.Parchived.parent
+        # then check for an empty dir and delete it
+        if os.listdir(path2archived) == []:
+            print(f"removing {path2archived} after unarchive}")
+            os.rmdir(path2archived)
     else:
         # to be popoulated of Target named tuples
         single_run = list()
