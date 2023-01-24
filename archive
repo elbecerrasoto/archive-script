@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import shutil
 import sys
 from collections import deque, namedtuple
@@ -8,8 +9,8 @@ from pathlib import Path
 from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
 DAY = gen_naming_scheme()
-ARCHIVED = Path("./archived/")
-HISTORY_FILE = Path('./archived/.archive_history.pickle')
+ARCHIVED = Path("./archived/").resolve()
+HISTORY_FILE = Path('./archived/.archive_history.pickle').resolve()
 
 Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
@@ -51,16 +52,17 @@ if __name__ == "__main__":
 
     # Main loop
     if UNARCHIVE:
+        print(f"pwd is {os.getcwd()}")
         # Pop history
         to_undo = history.pop()
         for target in to_undo:
-            print(f"move {target.Parchived} to {target.Poriginal.parent}")
+            print(f"unarchive {target.Parchived} to {target.Poriginal.parent}")
             shutil.move(target.Parchived,target.Poriginal.parent)
 
         path2archived = target.Parchived.parent
         # then check for an empty dir and delete it
         if os.listdir(path2archived) == []:
-            print(f"removing {path2archived} after unarchive}")
+            print(f"removing {path2archived} after unarchive")
             os.rmdir(path2archived)
     else:
         # to be popoulated of Target named tuples

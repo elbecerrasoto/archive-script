@@ -22,11 +22,11 @@ def gen_tmp_files(tmp_path):
         tmp_files = []
 
         for i in range(n):
-            tmp_file = PATH / (str(i) + SUFFIX)
+            tmp_file = (PATH / (str(i) + SUFFIX)).resolve()
             tmp_file.write_text(CONTENT)
             tmp_files.append(tmp_file)
 
-        return tmp_files
+        return tuple(tmp_files)
 
     return x
 
@@ -112,18 +112,27 @@ def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     os.chdir(tmp_path)
 
     os.system(f"{PROGRAM} {f1}")
+    assert not f1.exists()
     os.system(f"{PROGRAM} {f2}")
-
     assert not f2.exists()
 
+    # f2 is unarchived
     os.system(f"{PROGRAM} -u")
-    # f2 returns
-    assert destination.exists()
-    assert set(os.listdir(destination)) == set([f1.name])
+    print(f"f2 is {f2}")
+    print(f"my current dir looks like this {os.listdir('.')}")
+    assert f2.name in set(os.listdir("."))
     assert f2.exists()
+    # archive dir is not yet deleted
+    assert destination.exists()
+    # f1 is the file remaining archived destination
+    assert set(os.listdir(destination)) == set([f1.name])
+
+    # So I'm passing all the tests for f2
 
     # f1 returns
     os.system(f"{PROGRAM} -u")
+    print(f"second dir printing {os.listdir('.')}")
+    assert f1.name in set(os.listdir("."))
     assert f1.exists()
     assert not destination.exist()
 
