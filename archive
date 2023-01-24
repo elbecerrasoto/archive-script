@@ -23,7 +23,8 @@ if __name__ == "__main__":
     args = PARSER.parse_args()
 
     DRY = args.dry
-    TARGETS = args.targets
+    TARGETS = set(args.targets)
+    TARGET = TARGETS - {'.', str(ARCHIVED), ''}
     UNARCHIVE = args.unarchive
 
     if not TARGETS and not UNARCHIVE:
@@ -68,7 +69,6 @@ if __name__ == "__main__":
         # to be popoulated of Target named tuples
         single_run = list()
         for target in TARGETS:
-            if target == "" or target == str(ARCHIVED): continue
 
             target = Path(target)
 
