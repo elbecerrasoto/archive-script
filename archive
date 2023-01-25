@@ -65,6 +65,9 @@ if __name__ == "__main__":
         if os.listdir(path2archived) == []:
             print(f"removing {path2archived} after unarchive")
             os.rmdir(path2archived)
+
+        # if everything went ok, write history
+        pickle_obj(history,HISTORY_FILE)
     else:
         # to be popoulated of Target named tuples
         single_run = list()

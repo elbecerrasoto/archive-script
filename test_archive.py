@@ -107,7 +107,7 @@ def test_unarchive(tmp_path, gen_tmp_files):
 
 # Random chain of creations and destructions
 # It is a good idea
-@pytest.mark.skip(reason="I don't want to deal with this")
+# @pytest.mark.skip(reason="I don't want to deal with this")
 def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     (f1, f2) = gen_tmp_files(2)
     os.chdir(tmp_path)
@@ -127,15 +127,20 @@ def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     assert destination.exists()
     # f1 is the file remaining archived destination
     assert set(os.listdir(destination)) == set([f1.name])
+    assert str(f2.name) in os.listdir(".")
 
     # So I'm passing all the tests for f2
-
     # f1 returns
     os.system(f"{PROGRAM} -u")
     print(f"second dir printing {os.listdir('.')}")
+    # failing
     assert f1.name in set(os.listdir("."))
     assert f1.exists()
-    assert not destination.exist()
+    assert not destination.exists()
+
+
+def test_unarchive_deque_implementation():
+    pass
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
