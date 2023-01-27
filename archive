@@ -58,7 +58,7 @@ if __name__ == "__main__":
         to_undo = history.pop()
         for target in to_undo:
             print(f"unarchive {target.Parchived} to {target.Poriginal.parent}")
-            shutil.move(target.Parchived,target.Poriginal.parent)
+            shutil.move(str(target.Parchived),str(target.Poriginal.parent))
 
         path2archived = target.Parchived.parent
         # then check for an empty dir and delete it
@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 print(f"{target} --> {destination})")
             else:
                 try:
-                    shutil.move(target, destination)
+                    shutil.move(str(target), str(destination))
                     single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
                 except shutil.Error as e:
                     print("Blocking files/dirs were found", e)
