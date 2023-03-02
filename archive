@@ -30,8 +30,8 @@ if __name__ == "__main__":
         PARSER.print_help(file=None)
         sys.exit()
 
-    SUFFIX = None
-    destination = ARCHIVED / DAY if SUFFIX is None else ARCHIVED / str(DAY) + '_' + SUFFIX
+    SUFFIX = args.suffix
+    destination = ARCHIVED / DAY if SUFFIX is None else ARCHIVED / (str(DAY) + '_' + SUFFIX)
 
     try:
         if DRY and not destination.exists():

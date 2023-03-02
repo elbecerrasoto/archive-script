@@ -42,4 +42,8 @@ def get_cliparser():
 
     parser.add_argument("--unarchive", "-u", action="store_true", help="Undo action.")
 
+    parser.add_argument(
+        "--suffix", "-s", help="Suffix for the destination. DATE_SUFFIX", default=None
+    )
+
     return parser
