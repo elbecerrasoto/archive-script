@@ -7,7 +7,7 @@ from pathlib import Path
 
 from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
-DAY = gen_naming_scheme()
+DAY = Path(gen_naming_scheme())
 ARCHIVED = Path("./archived/").resolve()
 HISTORY_FILE = Path('./archived/.archive_history.pickle').resolve()
 
@@ -30,7 +30,8 @@ if __name__ == "__main__":
         PARSER.print_help(file=None)
         sys.exit()
 
-    destination = ARCHIVED / DAY
+    SUFFIX = None
+    destination = ARCHIVED / DAY if SUFFIX is None else ARCHIVED / str(DAY) + '_' + SUFFIX
 
     try:
         if DRY and not destination.exists():
