@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import argparse
 import os
 import shutil
 import sys
@@ -23,8 +22,7 @@ if __name__ == "__main__":
     args = PARSER.parse_args()
 
     DRY = args.dry
-    TARGETS = set(args.targets)
-    TARGET = TARGETS - {'.', str(ARCHIVED), ''}
+    TARGETS = set(args.targets) - {'.', str(ARCHIVED), ''}
     UNARCHIVE = args.unarchive
 
     if not TARGETS and not UNARCHIVE:
@@ -53,17 +51,14 @@ if __name__ == "__main__":
 
     # Main loop
     if UNARCHIVE:
-        print(f"pwd is {os.getcwd()}")
         # Pop history
         to_undo = history.pop()
         for target in to_undo:
-            print(f"unarchive {target.Parchived} to {target.Poriginal.parent}")
             shutil.move(str(target.Parchived),str(target.Poriginal.parent))
 
         path2archived = target.Parchived.parent
         # then check for an empty dir and delete it
         if os.listdir(path2archived) == []:
-            print(f"removing {path2archived} after unarchive")
             os.rmdir(path2archived)
 
         # if everything went ok, write history
