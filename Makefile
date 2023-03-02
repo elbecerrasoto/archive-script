@@ -45,9 +45,8 @@ test-coverage :
 test-slow :
 	time pytest -m "slow" -x ./
 
-linter : # Finds debugging prints
-	find ./gym_cellular_automata/ -type f -name "*.py" | sed '/test/ d' | xargs egrep -n 'print\(|ic\(' | cat
-	mypy --config-file mypy.ini ./
+prints-appear : # Finds debugging prints
+	rg 'print\(|ic\('
 
 clean : # Depends on trash-cli  https://github.com/andreafrancia/trash-cli
 	find ./ -type d -name '__pycache__' | xargs -I{} \rm -r {}

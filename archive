@@ -2,56 +2,90 @@
 import argparse
 import os
 import shutil
+import sys
+from collections import deque, namedtuple
 from pathlib import Path
 
-from utils import gen_naming_scheme
-
-# passing the test
+from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
 DAY = gen_naming_scheme()
-ARCHIVED = Path("./archived/")
+ARCHIVED = Path("./archived/").resolve()
+HISTORY_FILE = Path('./archived/.archive_history.pickle').resolve()
 
-def parse_args():
-    parser = argparse.ArgumentParser()
+Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
-    parser.description = (
-        f"""Get out of my way! I don't want to deal with you!
-        Move files into {ARCHIVED}"""
-    )
-
-    parser.add_argument("targets", nargs="+", help="files to move")
-
-    parser.add_argument(
-        "--dry",
-        "-d",
-        action="store_true",
-        help="Dry run.",
-    )
-
-    return parser.parse_args()
 
 
 if __name__ == "__main__":
 
-    args = parse_args()
+    PARSER = get_cliparser()
+
+    args = PARSER.parse_args()
 
     DRY = args.dry
-    TARGETS = args.targets
+    TARGETS = set(args.targets)
+    TARGET = TARGETS - {'.', str(ARCHIVED), ''}
+    UNARCHIVE = args.unarchive
+
+    if not TARGETS and not UNARCHIVE:
+        # print usage to stdout
+        PARSER.print_help(file=None)
+        sys.exit()
 
     destination = ARCHIVED / DAY
 
     try:
-        if DRY:
+        if DRY and not destination.exists():
             print(f"{destination} would've been created.")
         else:
             destination.mkdir(parents=True)
     except FileExistsError:
-        pass # Failing downstream? if destination is a file
+        if destination.is_file():
+            # if sys.exit print a string sends error code 256 ?!
+            print("Error: there is a file blocking the archiving.")
+            sys.exit()
 
-    for target in TARGETS:
-        target = Path(target)
-        if target == ARCHIVED: continue
-        if DRY:
-            print(f"{target} would've been moved to {destination})")
-        else:
-            shutil.move(target, destination)
+
+    try:
+        history = unpickle_path(HISTORY_FILE)
+    except FileNotFoundError:
+        history = deque()
+
+    # Main loop
+    if UNARCHIVE:
+        print(f"pwd is {os.getcwd()}")
+        # Pop history
+        to_undo = history.pop()
+        for target in to_undo:
+            print(f"unarchive {target.Parchived} to {target.Poriginal.parent}")
+            shutil.move(str(target.Parchived),str(target.Poriginal.parent))
+
+        path2archived = target.Parchived.parent
+        # then check for an empty dir and delete it
+        if os.listdir(path2archived) == []:
+            print(f"removing {path2archived} after unarchive")
+            os.rmdir(path2archived)
+
+        # if everything went ok, write history
+        pickle_obj(history,HISTORY_FILE)
+    else:
+        # to be popoulated of Target named tuples
+        single_run = list()
+        for target in TARGETS:
+
+            target = Path(target)
+
+            if DRY:
+                print(f"{target} --> {destination})")
+            else:
+                try:
+                    shutil.move(str(target), str(destination))
+                    single_run.append(Target(Poriginal=target, Parchived= destination / target.name ))
+                except shutil.Error as e:
+                    print("Blocking files/dirs were found", e)
+                    sys.exit()
+
+        if not DRY:
+            # Push (append) to history stack, grows on the right.
+            history.append(tuple(single_run))
+            pickle_obj(history, HISTORY_FILE)
