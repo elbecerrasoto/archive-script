@@ -25,10 +25,18 @@ if __name__ == "__main__":
     TARGETS = set(args.targets) - {'.', str(ARCHIVED), ''}
     UNARCHIVE = args.unarchive
 
-    if not TARGETS and not UNARCHIVE:
+
+    def args_help():
         # print usage to stdout
         PARSER.print_help(file=None)
         sys.exit()
+
+    if not TARGETS and not UNARCHIVE:
+        args_help()
+
+    if UNARCHIVE and not HISTORY_FILE.exists():
+        print("No history to undo.")
+        args_help()
 
     SUFFIX = args.suffix
     destination = ARCHIVED / DAY if SUFFIX is None else ARCHIVED / (str(DAY) + '_' + SUFFIX)
@@ -55,14 +63,16 @@ if __name__ == "__main__":
         # Pop history
         to_undo = history.pop()
         for target in to_undo:
-            shutil.move(str(target.Parchived),str(target.Poriginal.parent))
+            try:
+                shutil.move(str(target.Parchived),str(target.Poriginal.parent))
+            except FileNotFoundError:
+                print(f"File Not Found: {str(target.Parchived)}")
 
-        path2archived = target.Parchived.parent
         # then check for an empty dir and delete it
-        if os.listdir(path2archived) == []:
+        path2archived = target.Parchived.parent
+        if path2archived.exists() and os.listdir(path2archived) == []:
             os.rmdir(path2archived)
 
-        # if everything went ok, write history
         pickle_obj(history,HISTORY_FILE)
     else:
         # to be popoulated of Target named tuples
