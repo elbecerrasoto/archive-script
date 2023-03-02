@@ -139,8 +139,13 @@ def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     assert not destination.exists()
 
 
-def test_unarchive_deque_implementation():
-    pass
+def test_suffix(tmp_path, gen_tmp_files, destination):
+    (f1,) = gen_tmp_files(1)
+    os.chdir(tmp_path)
+
+    os.system(f"{PROGRAM} {f1} -s TEST")
+    assert not (destination).exists()
+    assert Path(str(destination) + "_" + "TEST").exists()
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
