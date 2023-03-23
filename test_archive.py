@@ -4,9 +4,10 @@ from pathlib import Path
 import pytest
 
 from utils import gen_naming_scheme, get_cliparser
+from archive import ARCHIVED_NAME
 
-PROGRAM = Path("./archive").resolve()
-ARCHIVED = Path("archived/")
+PROGRAM = Path("./archive.py").resolve()
+ARCHIVED = Path(f"{ARCHIVED_NAME}/")
 DAY = Path(gen_naming_scheme())
 CONTENT = "Destination Demoted!"
 PARSER = get_cliparser()

@@ -7,9 +7,11 @@ from pathlib import Path
 
 from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
+ARCHIVED_NAME = "0-archived"
+
 DAY = Path(gen_naming_scheme())
-ARCHIVED = Path("./archived/").resolve()
-HISTORY_FILE = Path('./archived/.archive_history.pickle').resolve()
+ARCHIVED = Path(f"./{ARCHIVED_NAME}/").resolve()
+HISTORY_FILE = Path(f"./{ARCHIVED_NAME}/.archive_history.pickle").resolve()
 
 Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
