@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import argparse
 import os
 import shutil
 import sys
@@ -8,9 +7,11 @@ from pathlib import Path
 
 from utils import gen_naming_scheme, get_cliparser, pickle_obj, unpickle_path
 
-DAY = gen_naming_scheme()
-ARCHIVED = Path("./archived/").resolve()
-HISTORY_FILE = Path('./archived/.archive_history.pickle').resolve()
+ARCHIVED_NAME = "0-archived"
+
+DAY = Path(gen_naming_scheme())
+ARCHIVED = Path(f"./{ARCHIVED_NAME}/").resolve()
+HISTORY_FILE = Path(f"./{ARCHIVED_NAME}/.archive_history.pickle").resolve()
 
 Target = namedtuple("Target", ["Poriginal", "Parchived"])
 
@@ -23,16 +24,24 @@ if __name__ == "__main__":
     args = PARSER.parse_args()
 
     DRY = args.dry
-    TARGETS = set(args.targets)
-    TARGET = TARGETS - {'.', str(ARCHIVED), ''}
+    TARGETS = set(args.targets) - {'.', str(ARCHIVED), ''}
     UNARCHIVE = args.unarchive
 
-    if not TARGETS and not UNARCHIVE:
+
+    def args_help():
         # print usage to stdout
         PARSER.print_help(file=None)
         sys.exit()
 
-    destination = ARCHIVED / DAY
+    if not TARGETS and not UNARCHIVE:
+        args_help()
+
+    if UNARCHIVE and not HISTORY_FILE.exists():
+        print("No history to undo.")
+        args_help()
+
+    SUFFIX = args.suffix
+    destination = ARCHIVED / DAY if SUFFIX is None else ARCHIVED / (str(DAY) + '_' + SUFFIX)
 
     try:
         if DRY and not destination.exists():
@@ -53,20 +62,19 @@ if __name__ == "__main__":
 
     # Main loop
     if UNARCHIVE:
-        print(f"pwd is {os.getcwd()}")
         # Pop history
         to_undo = history.pop()
         for target in to_undo:
-            print(f"unarchive {target.Parchived} to {target.Poriginal.parent}")
-            shutil.move(str(target.Parchived),str(target.Poriginal.parent))
+            try:
+                shutil.move(str(target.Parchived),str(target.Poriginal.parent))
+            except FileNotFoundError:
+                print(f"File Not Found: {str(target.Parchived)}")
 
-        path2archived = target.Parchived.parent
         # then check for an empty dir and delete it
-        if os.listdir(path2archived) == []:
-            print(f"removing {path2archived} after unarchive")
+        path2archived = target.Parchived.parent
+        if path2archived.exists() and os.listdir(path2archived) == []:
             os.rmdir(path2archived)
 
-        # if everything went ok, write history
         pickle_obj(history,HISTORY_FILE)
     else:
         # to be popoulated of Target named tuples
