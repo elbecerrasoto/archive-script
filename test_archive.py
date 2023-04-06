@@ -4,9 +4,10 @@ from pathlib import Path
 import pytest
 
 from utils import gen_naming_scheme, get_cliparser
+from archive import ARCHIVED_NAME
 
-PROGRAM = Path("./archive").resolve()
-ARCHIVED = Path("archived/")
+PROGRAM = Path("./archive.py").resolve()
+ARCHIVED = Path(f"{ARCHIVED_NAME}/")
 DAY = Path(gen_naming_scheme())
 CONTENT = "Destination Demoted!"
 PARSER = get_cliparser()
@@ -139,8 +140,13 @@ def test_no_empty_directories(tmp_path, gen_tmp_files, destination):
     assert not destination.exists()
 
 
-def test_unarchive_deque_implementation():
-    pass
+def test_suffix(tmp_path, gen_tmp_files, destination):
+    (f1,) = gen_tmp_files(1)
+    os.chdir(tmp_path)
+
+    os.system(f"{PROGRAM} {f1} -s TEST")
+    assert not (destination).exists()
+    assert Path(str(destination) + "_" + "TEST").exists()
 
 
 def test_name_collisions(tmp_path, gen_tmp_files, destination):
